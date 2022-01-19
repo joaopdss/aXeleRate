@@ -65,11 +65,6 @@ class MapEvaluation(tensorflow.keras.callbacks.Callback):
 					self.bestMap = _map
 					self.bestLoss = logs.get("val_loss")
 					self.model.save(self._save_name,overwrite=True,include_optimizer=False)
-				elif self._save_best and self._save_name is not None and _map > self.bestMap:
-					print("mAP improved from {} to {}, saving model to {}.".format(self.bestMap, _map, self._save_name))
-					self.bestMap = _map
-					self.bestLoss = logs.get("val_loss")
-					self.model.save(self._save_name,overwrite=True,include_optimizer=False)
 				else:
 					print("val_loss did not improve from {}.".format(self.bestLoss))
 
