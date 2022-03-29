@@ -15,7 +15,8 @@ def configs(network_type):
             "input_size":           [224,224],
             "fully-connected":      [],
             "labels":               [],
-            "dropout" : 		    0.5
+            "dropout" : 		    0.5,
+            "activation_func": ""
         },
         "weights" : {
             "full":   				"",
