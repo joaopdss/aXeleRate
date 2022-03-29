@@ -34,7 +34,8 @@ def configs(network_type):
             "learning_rate":        1e-4,
             "saved_folder":   		"classifier",
             "first_trainable_layer": "",
-            "augumentation":		True
+            "augumentation":		True,
+            "loss_func": ""
         },
         "converter" : {
             "type":   				[]
