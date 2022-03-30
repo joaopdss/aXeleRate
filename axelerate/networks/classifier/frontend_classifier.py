@@ -22,6 +22,7 @@ def create_classifier(architecture, labels, input_size, layers, dropout, weights
             x=Dense(layer,activation='relu')(x) 
             x=Dropout(dropout)(x)
         x=Dense(layers[-1],activation='relu')(x)
+    print(f"Activation function is {activation_func}")
     preds=Dense(len(labels),activation=activation_func)(x)
     model=Model(inputs=base_model.feature_extractor.inputs[0],outputs=preds, name='classifier')
 
@@ -81,7 +82,7 @@ class Classifier(object):
               first_trainable_layer=None,
               metrics="val_loss",
               loss_func="categorical_crossentropy"):
-
+        print(f"Loss function is {loss_func}")
         if metrics != "val_accuracy" and metrics != "val_loss":
             print("Unknown metric for Classifier, valid options are: val_loss or val_accuracy. Defaulting ot val_loss")
             metrics = "val_loss"
