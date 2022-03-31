@@ -82,7 +82,8 @@ def train_from_config(config,project_folder):
 									   config['model']['fully-connected'],
 									   config['model']['dropout'],
 									   config['weights']['backend'],
-									   config['weights']['save_bottleneck'])   
+									   config['weights']['save_bottleneck'],
+					      				   config['model']['activation'])   
 		# 2. Load the pretrained weights (if any) 
 		classifier.load_weights(config['weights']['full'], by_name=True)
 
@@ -97,7 +98,8 @@ def train_from_config(config,project_folder):
 											   config['train']['valid_times'],
 											   config['train']['valid_image_folder'],
 											   config['train']['first_trainable_layer'],
-											   config['train']['valid_metric'])
+											   config['train']['valid_metric'],
+							   				   config['train']['loss'])
 
 
 
