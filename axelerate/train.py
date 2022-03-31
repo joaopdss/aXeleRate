@@ -99,7 +99,7 @@ def train_from_config(config,project_folder):
 											   config['train']['valid_image_folder'],
 											   config['train']['first_trainable_layer'],
 											   config['train']['valid_metric'],
-							   				   config['train']['loss'])
+							   				   config['model']['loss'])
 
 
 
