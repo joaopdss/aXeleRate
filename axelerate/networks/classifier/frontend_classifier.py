@@ -13,7 +13,7 @@ def get_labels(directory):
     labels = sorted(os.listdir(directory))
     return labels
 
-def create_classifier(architecture, labels, input_size, layers, dropout, activation_func, weights=None, save_bottleneck=False):
+def create_classifier(architecture, labels, input_size, layers, dropout, weights=None, save_bottleneck=False, activation="softmax"):
     base_model=create_feature_extractor(architecture, input_size, weights)
     x=base_model.feature_extractor.outputs[0]
     x=GlobalAveragePooling2D()(x)
@@ -22,8 +22,8 @@ def create_classifier(architecture, labels, input_size, layers, dropout, activat
             x=Dense(layer,activation='relu')(x) 
             x=Dropout(dropout)(x)
         x=Dense(layers[-1],activation='relu')(x)
-    print(f"Activation function is {activation_func}")
-    preds=Dense(len(labels),activation=activation_func)(x)
+    print(f"Activation function is {activation}")
+    preds=Dense(len(labels),activation=activation)(x)
     model=Model(inputs=base_model.feature_extractor.inputs[0],outputs=preds, name='classifier')
 
     bottleneck_layer = None
@@ -81,7 +81,7 @@ class Classifier(object):
               valid_img_folder="",
               first_trainable_layer=None,
               metrics="val_loss",
-              loss_func="binary_crossentropy"):
+              loss="categorical_crossentropy"):
         print(f"Loss function is {loss_func}")
         if metrics != "val_accuracy" and metrics != "val_loss":
             print("Unknown metric for Classifier, valid options are: val_loss or val_accuracy. Defaulting ot val_loss")
