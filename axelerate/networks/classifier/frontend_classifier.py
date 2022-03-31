@@ -82,13 +82,13 @@ class Classifier(object):
               first_trainable_layer=None,
               metrics="val_loss",
               loss="categorical_crossentropy"):
-        print(f"Loss function is {loss_func}")
+        print(f"Loss function is {loss}")
         if metrics != "val_accuracy" and metrics != "val_loss":
             print("Unknown metric for Classifier, valid options are: val_loss or val_accuracy. Defaulting ot val_loss")
             metrics = "val_loss"
 
         train_generator, validation_generator = create_datagen(img_folder, valid_img_folder, batch_size, self._input_size, project_folder, augumentation, self._norm)
-        model_layers, model_path = train(self._network,loss_func,train_generator,validation_generator,learning_rate, nb_epoch, project_folder,first_trainable_layer, self, metrics)
+        model_layers, model_path = train(self._network,loss,train_generator,validation_generator,learning_rate, nb_epoch, project_folder,first_trainable_layer, self, metrics)
         if self._bottleneck_layer:
             self.save_bottleneck(model_path, self._bottleneck_layer)
         return model_layers, model_path
