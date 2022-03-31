@@ -13,7 +13,7 @@ def get_labels(directory):
     labels = sorted(os.listdir(directory))
     return labels
 
-def create_classifier(architecture, labels, input_size, layers, dropout, weights=None, save_bottleneck=False, activation_func):
+def create_classifier(architecture, labels, input_size, layers, dropout, activation_func, weights=None, save_bottleneck=False):
     base_model=create_feature_extractor(architecture, input_size, weights)
     x=base_model.feature_extractor.outputs[0]
     x=GlobalAveragePooling2D()(x)
