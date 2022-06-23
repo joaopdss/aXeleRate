@@ -56,6 +56,7 @@ from __future__ import division
 
 import os
 import warnings
+import tensorflow as tf
 
 from . import get_submodules_from_kwargs
 from . import imagenet_utils
@@ -273,7 +274,7 @@ def MobileNet(input_shape=None,
         x = layers.Conv2D(classes, (1, 1),
                           padding='same',
                           name='conv_preds')(x)
-        x = layers.Activation('softmax', name='act_softmax')(x)
+        x = layers.Activation('softmax', dtype=tf.float32, name='act_softmax')(x)
         x = layers.Reshape((classes,), name='reshape_2')(x)
     else:
         if pooling == 'avg':
