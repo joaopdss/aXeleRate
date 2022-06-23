@@ -278,9 +278,9 @@ def MobileNet(input_shape=None,
         x = layers.Reshape((classes,), name='reshape_2')(x)
     else:
         if pooling == 'avg':
-            x = layers.GlobalAveragePooling2D()(x)
+            x = layers.GlobalAveragePooling2D(dtype=tf.float32)(x)
         elif pooling == 'max':
-            x = layers.GlobalMaxPooling2D()(x)
+            x = layers.GlobalMaxPooling2D(dtype=tf.float32)(x)
 
     # Ensure that the model takes into account
     # any potential predecessors of `input_tensor`.
