@@ -18,6 +18,7 @@ def create_feature_extractor(architecture, input_size, weights = None):
 	# Returns
 		feature_extractor : BaseFeatureExtractor instance
 	"""
+	print(f"Architecture: {architecture}")
 	if architecture == 'DenseNet121':
 		feature_extractor = DenseNet121Feature(input_size, weights)
 	elif architecture == 'SqueezeNet':
