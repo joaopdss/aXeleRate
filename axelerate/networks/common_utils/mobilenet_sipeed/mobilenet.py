@@ -325,7 +325,8 @@ def MobileNet(input_shape=None,
 
     if old_data_format:
         backend.set_image_data_format(old_data_format)
-
+    from tensorflow.keras import mixed_precision
+    mixed_precision.set_global_policy("float32")
     return model
 
 
