@@ -262,7 +262,7 @@ def MobileNet(input_shape=None,
                               strides=(2, 2), block_id=12)
     x = _depthwise_conv_block(x, 1024, alpha, depth_multiplier, block_id=13)
 
-    if not include_top:
+    if include_top:
         if backend.image_data_format() == 'channels_first':
             shape = (int(1024 * alpha), 1, 1)
         else:
@@ -277,6 +277,7 @@ def MobileNet(input_shape=None,
         x = layers.Activation('softmax', dtype=tf.float32, name='act_softmax')(x)
         x = layers.Reshape((classes,), name='reshape_2')(x)
     else:
+        print("else")
         if pooling == 'avg':
             x = layers.GlobalAveragePooling2D(dtype=tf.float32)(x)
         elif pooling == 'max':
@@ -324,8 +325,7 @@ def MobileNet(input_shape=None,
 
     if old_data_format:
         backend.set_image_data_format(old_data_format)
-    print("Model")
-    print(model)
+
     return model
 
 
