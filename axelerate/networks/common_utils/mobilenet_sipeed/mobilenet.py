@@ -262,7 +262,7 @@ def MobileNet(input_shape=None,
                               strides=(2, 2), block_id=12)
     x = _depthwise_conv_block(x, 1024, alpha, depth_multiplier, block_id=13)
 
-    if include_top:
+    if not include_top:
         if backend.image_data_format() == 'channels_first':
             shape = (int(1024 * alpha), 1, 1)
         else:
