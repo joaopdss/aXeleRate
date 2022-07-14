@@ -198,5 +198,4 @@ class ImageDataAugmentor(Sequence):
         """
         image = self.process_image(image, desired_w, desired_h, self.augment)
 	image = self.preprocess_input(image)
-
-        return image
+	return image
