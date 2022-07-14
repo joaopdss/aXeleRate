@@ -199,6 +199,6 @@ class ImageDataAugmentor(Sequence):
         image = self.process_image(image, desired_w, desired_h, self.augment)
 	
 				if self.preprocess_input != None:
-        	image = self.preprocess_input(image)
+			image = self.preprocess_input(image)
 		
         return image
