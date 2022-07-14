@@ -29,8 +29,11 @@ def create_classifier(architecture, labels, input_size, layers, dropout, weights
     bottleneck_layer = None
     if save_bottleneck:
         bottleneck_layer = base_model.feature_extractor.layers[-1].name
-    network = Classifier(model, input_size, labels, base_model.normalize, bottleneck_layer)
-
+    if architecture != 'EfficientNetB0':
+        network = Classifier(model, input_size, labels, base_model.normalize, bottleneck_layer)
+    else:
+        network = Classifier(model, input_size, labels, None, bottleneck_layer)
+    
     return network
 
 class Classifier(object):
