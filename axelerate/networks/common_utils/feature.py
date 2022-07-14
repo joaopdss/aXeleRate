@@ -6,6 +6,7 @@ from tensorflow.keras.layers import Concatenate
 from tensorflow.keras.applications import DenseNet121
 from tensorflow.keras.applications import NASNetMobile
 from tensorflow.keras.applications import ResNet50
+from tensorflow.keras.applications import EfficientNetB0
 
 from .mobilenet_sipeed.mobilenet import MobileNet
 
@@ -39,6 +40,8 @@ def create_feature_extractor(architecture, input_size, weights = None):
 		feature_extractor = NASNetMobileFeature(input_size, weights)
 	elif architecture == 'ResNet50':
 		feature_extractor = ResNet50Feature(input_size, weights)
+	elif architecture == 'EfficientNetB0':
+		feature_extractor = EfficientNetB0Feature(input_size, weights)
 	else:
 		raise Exception('Architecture not supported! Name should be Full Yolo, Tiny Yolo, MobileNet1_0, MobileNet7_5, MobileNet5_0, MobileNet2_5, SqueezeNet, NASNetMobile, ResNet50 or DenseNet121')
 	return feature_extractor
@@ -416,4 +419,18 @@ class ResNet50Feature(BaseFeatureExtractor):
 		image[..., 1] -= 116.779
 		image[..., 2] -= 123.68
 
-		return image 
+		return image
+
+class EfficientNetB0Feature(BaseFeatureExtractor):
+	def __init__(self, input_size, weights):
+		input_shape = Input(shape=(input_size[0], input_size[1], 3))
+		
+		if weights == 'imagenet':
+			efficientnetb0 = EfficientNetB0(input_tensor=input_shape, weights='imagenet', include_top=False, pooling=False)
+		else:
+			efficientnetb0 = EfficientNetB0(input_tensor=input_shape, include_top=False, pooling=False)
+			if weights:
+				efficientnetb0.load_weights(weights)
+				print('Loaded backend weights: ' + weights)
+		
+		self.feature_extractor = efficientnetb0
