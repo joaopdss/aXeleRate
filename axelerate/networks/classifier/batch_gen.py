@@ -197,6 +197,7 @@ class ImageDataAugmentor(Sequence):
         Transforms an image by first augmenting and then standardizing
         """
         image = self.process_image(image, desired_w, desired_h, self.augment)
-        image = self.preprocess_input(image)
+	if preprocess_input != None:
+		image = self.preprocess_input(image)
         
         return image
