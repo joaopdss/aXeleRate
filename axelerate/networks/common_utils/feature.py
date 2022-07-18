@@ -434,3 +434,6 @@ class EfficientNetB0Feature(BaseFeatureExtractor):
 				print('Loaded backend weights: ' + weights)
 		
 		self.feature_extractor = efficientnetb0
+		
+	def normalize(self, image):
+		return image
