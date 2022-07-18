@@ -35,7 +35,7 @@ def configs(network_type):
             "learning_rate":        1e-4,
             "saved_folder":   		"classifier",
             "first_trainable_layer": "",
-            "augumentation":		True,
+            "augmentation":		True,
             "loss_func": ""
         },
         "converter" : {
@@ -73,7 +73,7 @@ def configs(network_type):
             "learning_rate":        1e-4,
             "saved_folder":   		"detector",
             "first_trainable_layer": "",
-            "augumentation":		True,
+            "augmentation":		True,
             "is_only_detect" : 		False
         },
         "converter" : {
