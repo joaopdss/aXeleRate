@@ -30,7 +30,7 @@ def create_classifier(architecture, labels, input_size, layers, dropout, weights
     if save_bottleneck:
         bottleneck_layer = base_model.feature_extractor.layers[-1].name
 
-     network = Classifier(model, input_size, labels, base_model.normalize, bottleneck_layer)
+    network = Classifier(model, input_size, labels, base_model.normalize, bottleneck_layer)
     
     return network
 
