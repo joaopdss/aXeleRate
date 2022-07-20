@@ -121,7 +121,8 @@ def train(model,
 		callbacks.append(custom_callback)
 	else:
 		print('not using any custom_callbacks')
-
+	
+	print(f"Class indices : {train_batch_gen.class_indices}")
 	# 4. training
 	try:
 		model.fit_generator(generator = train_batch_gen,
