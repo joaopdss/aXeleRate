@@ -125,7 +125,8 @@ def train(model,
 	
 	print(f"Length train_batch_gen: {len(train_batch_gen)}")
 	print(f"Class indices: {train_batch_gen.class_indices}")
-	get_class_weights(train_batch_gen, imgs_folder)
+	class_weights = get_class_weights(train_batch_gen, imgs_folder)
+	print(f"Class weights: {class_weights}")
 	# 4. training
 	try:
 		model.fit_generator(generator = train_batch_gen,
@@ -137,7 +138,8 @@ def train(model,
 						verbose		  = 1,
 						workers		  = 4,
 						max_queue_size   = 10,
-						use_multiprocessing = True)
+						use_multiprocessing = True,
+				   		class_weight = class_weights)
 	except KeyboardInterrupt:
 		print("Saving model and copying logs")
 		model.save(save_weights_name_ctrlc, overwrite=True, include_optimizer=False)
@@ -158,5 +160,6 @@ def get_class_weights(train_batch_gen, project_folder):
 	class_weights = {}
 	for key, val in train_batch_gen.class_indices.items():
 		amount_imgs = len(os.listdir(os.path.join(project_folder, key)))
-		print(f"Class: {key} ; Amount: {amount_imgs}")
-# 		class_weights[val]
+		class_weights[val] = (1 / val) * (amount_imgs / 2.0)
+	
+	return class_weights
