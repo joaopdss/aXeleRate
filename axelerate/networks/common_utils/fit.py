@@ -127,7 +127,7 @@ def train(model,
 	print(f"Class weights: {class_weights}")
 	# 4. training
 	try:
-		model.fit_generator(generator = train_batch_gen,
+		model.fit(generator = train_batch_gen,
 						steps_per_epoch  = len(train_batch_gen), 
 						epochs		   = nb_epoch,
 						validation_data  = valid_batch_gen,
