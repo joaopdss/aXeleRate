@@ -89,7 +89,7 @@ class Classifier(object):
             metrics = "val_loss"
 
         train_generator, validation_generator = create_datagen(img_folder, valid_img_folder, batch_size, self._input_size, project_folder, augumentation, self._norm)
-        model_layers, model_path = train(self._network,loss,train_generator,validation_generator,learning_rate, nb_epoch, project_folder,first_trainable_layer, self, metrics)
+        model_layers, model_path = train(self._network,loss,train_generator,validation_generator,learning_rate, nb_epoch, project_folder,first_trainable_layer, self, metrics, imgs_folder=img_folder)
         if self._bottleneck_layer:
             self.save_bottleneck(model_path, self._bottleneck_layer)
         return model_layers, model_path
