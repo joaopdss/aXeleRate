@@ -160,8 +160,8 @@ def get_class_weights(train_batch_gen, project_folder):
 	class_weights = {}
 	for key, val in train_batch_gen.class_indices.items():
 		amount_imgs = len(os.listdir(os.path.join(project_folder, key)))
-		print(key)
-		print(val)
-		class_weights[val] = (1 / val) * (amount_imgs / 2.0)
+		print(train_batch_gen[0].shape)
+		print(train_batch_gen.shape)
+# 		class_weights[val] = (1 / amount_imgs) * ((len(train_batch_gen) * ) / 2.0)
 	
 	return class_weights
