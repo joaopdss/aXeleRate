@@ -147,7 +147,8 @@ class YOLO(object):
 				first_trainable_layer=first_trainable_layer,
 				network=self,
 				metrics="mAP",
-				custom_callback=custom_callback)
+				custom_callback=custom_callback,
+			    	imgs_folder=img_folder)
 
 	def _get_loss_func(self, batch_size):
 		return self._yolo_loss.custom_loss(batch_size)
