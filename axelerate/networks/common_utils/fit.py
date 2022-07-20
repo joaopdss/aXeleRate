@@ -124,6 +124,7 @@ def train(model,
 	
 	print(f"Length train_batch_gen: {len(train_batch_gen)}")
 	print(f"Class indices: {train_batch_gen.class_indices}")
+	get_class_weights(train_batch_gen, project_folder)
 	# 4. training
 	try:
 		model.fit_generator(generator = train_batch_gen,
@@ -152,8 +153,9 @@ def _print_time(process_time):
 	else:
 		print("{:d}-mins to train".format(int(process_time/60)))
 
-# def get_class_weights(train_batch_gen, project_folder):
-# 	class_weights = {}
-# 	for key, val in train_batch_gen.class_indices.items():
-# 		amount_
+def get_class_weights(train_batch_gen, project_folder):
+	class_weights = {}
+	for key, val in train_batch_gen.class_indices.items():
+		amount_imgs = len(os.listdir(os.path.join(project_folder, key)))
+		print(f"Class: {key} ; Amount: {amount_imgs}")
 # 		class_weights[val]
