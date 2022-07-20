@@ -29,7 +29,6 @@ def create_datagen(train_folder, valid_folder, batch_size, input_size, project_f
 			                                         shuffle=True)		
 				                                         
     labels = (train_generator.class_indices)
-    print(f"Class indices: {labels}")
     labels = dict((v,k) for k,v in labels.items())
     fo = open(os.path.join(project_folder,"labels.txt"), "w")
     for k,v in labels.items():
