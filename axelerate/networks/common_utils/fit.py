@@ -23,7 +23,8 @@ def train(model,
 		 first_trainable_layer=None,
 		 network=None,
 		 metrics="val_loss",
-		 custom_callback=None):
+		 custom_callback=None,
+	 	 imgs_folder="data/dataset"):
 	"""A function that performs training on a general keras model.
 
 	# Args
@@ -124,7 +125,7 @@ def train(model,
 	
 	print(f"Length train_batch_gen: {len(train_batch_gen)}")
 	print(f"Class indices: {train_batch_gen.class_indices}")
-	get_class_weights(train_batch_gen, project_folder)
+	get_class_weights(train_batch_gen, imgs_folder)
 	# 4. training
 	try:
 		model.fit_generator(generator = train_batch_gen,
