@@ -90,5 +90,5 @@ class Segnet(object):
         validation_generator = create_batch_generator(valid_img_folder, valid_ann_folder, self._input_size, 
                                self._output_size, self._n_classes, batch_size, valid_times, False, self._norm)
         
-        return train(self._network, loss_k, train_generator, validation_generator, learning_rate, nb_epoch, project_folder, first_trainable_layer, self, metrics)
+        return train(self._network, loss_k, train_generator, validation_generator, learning_rate, nb_epoch, project_folder, first_trainable_layer, self, metrics, imgs_folder=img_folder)
     
