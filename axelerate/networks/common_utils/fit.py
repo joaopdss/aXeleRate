@@ -123,8 +123,6 @@ def train(model,
 	else:
 		print('not using any custom_callbacks')
 	
-	print(f"Length train_batch_gen: {len(train_batch_gen)}")
-	print(f"Class indices: {train_batch_gen.class_indices}")
 	class_weights = get_class_weights(train_batch_gen, imgs_folder)
 	print(f"Class weights: {class_weights}")
 	# 4. training
@@ -158,11 +156,9 @@ def _print_time(process_time):
 
 def get_class_weights(train_batch_gen, imgs_folder):
 	class_weights = {}
-	print(sum(len(files) for _, _, files in os.walk(imgs_folder)))
+	total_imgs = sum(len(files) for _, _, files in os.walk(imgs_folder))
 	for key, val in train_batch_gen.class_indices.items():
-		amount_imgs = len(os.listdir(os.path.join(imgs_folder, key)))
-# 		print(train_batch_gen[0])
-# 		print(train_batch_gen.shape)
-# 		class_weights[val] = (1 / amount_imgs) * ((len(train_batch_gen) * ) / 2.0)
+		class_amount_imgs = len(os.listdir(os.path.join(imgs_folder, key)))
+		class_weights[val] = (1 / class_amount_imgs) * (total_imgs / 2.0)
 	
 	return class_weights
