@@ -156,11 +156,11 @@ def _print_time(process_time):
 	else:
 		print("{:d}-mins to train".format(int(process_time/60)))
 
-def get_class_weights(train_batch_gen, project_folder):
+def get_class_weights(train_batch_gen, imgs_folder):
 	class_weights = {}
+	print(sum(len(files) for _, _, files in os.walk(imgs_folder)))
 	for key, val in train_batch_gen.class_indices.items():
-		amount_imgs = len(os.listdir(os.path.join(project_folder, key)))
-		print(train_batch_gen[0])
+		amount_imgs = len(os.listdir(os.path.join(imgs_folder, key)))
 # 		print(train_batch_gen[0])
 # 		print(train_batch_gen.shape)
 # 		class_weights[val] = (1 / amount_imgs) * ((len(train_batch_gen) * ) / 2.0)
