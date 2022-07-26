@@ -209,9 +209,11 @@ class Converter(object):
         self.model_path = os.path.abspath(model_path)
 
         if 'k210' in self._converter_type:
+            print("k210")
             self.convert_tflite(model, model_layers, 'k210')
+            print("convert k210")
             self.convert_k210(self.model_path.split(".")[0] + '.tflite')
-
+            print("converted")
         if 'edgetpu' in self._converter_type:
             self.convert_tflite(model, model_layers, 'edgetpu')
             self.convert_edgetpu(model_path.split(".")[0] + '.tflite')
