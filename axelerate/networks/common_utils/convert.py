@@ -21,9 +21,9 @@ def run_command(cmd, cwd=None):
     with subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, executable='/bin/bash', universal_newlines=True, cwd=cwd) as p:
         while True:
             line = p.stdout.readline()
+            print(line)
             if not line:
                 break
-            print(line)
             print("teste")
         exit_code = p.poll()
     return exit_code
