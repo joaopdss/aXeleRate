@@ -21,10 +21,8 @@ def run_command(cmd, cwd=None):
     with subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, executable='/bin/bash', universal_newlines=True, cwd=cwd) as p:
         while True:
             line = p.stdout.readline()
-            print(line)
             if not line:
                 break
-            print("teste")
         exit_code = p.poll()
     return exit_code
 
@@ -165,6 +163,7 @@ class Converter(object):
         #sess.close()
 
     def convert_tflite(self, model, model_layers, target=None):
+        print(f"Model type: {model.name}")
         model_type = model.name
         if model_type == 'yolo':
             model = tf.keras.Model(inputs=model.input, outputs=model.layers[-2].output)
@@ -210,7 +209,7 @@ class Converter(object):
         self.model_path = os.path.abspath(model_path)
 
         if 'k210' in self._converter_type:
-            print("k210")
+            print("WARN: Não funciona se estiver usando EfficientNetB0, boa sorte.")
             self.convert_tflite(model, model_layers, 'k210')
             print("convert k210")
             self.convert_k210(self.model_path.split(".")[0] + '.tflite')
