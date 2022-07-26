@@ -23,7 +23,8 @@ def run_command(cmd, cwd=None):
             line = p.stdout.readline()
             if not line:
                 break
-            print(line)    
+            print(line)
+            print("teste")
         exit_code = p.poll()
     return exit_code
 
