@@ -163,14 +163,13 @@ class Converter(object):
         #sess.close()
 
     def convert_tflite(self, model, model_layers, target=None):
-        print(f"Model type: {model.name}")
         model_type = model.name
         if model_type == 'yolo':
             model = tf.keras.Model(inputs=model.input, outputs=model.layers[-2].output)
             print("Converting to tflite without Reshape")
             
         if target=='k210': 
-            if not model_type == 'segnet':   
+            if model_type == 'segnet':   
                 print("Converting to tflite with old converter for K210 Segnet")
                 converter = tf.lite.TFLiteConverter.from_keras_model(model)
                 converter.experimental_new_converter = False
@@ -209,11 +208,9 @@ class Converter(object):
         self.model_path = os.path.abspath(model_path)
 
         if 'k210' in self._converter_type:
-            print("WARN: Não funciona se estiver usando EfficientNetB0, boa sorte.")
             self.convert_tflite(model, model_layers, 'k210')
-            print("convert k210")
-            self.convert_k210(self.model_path.split(".")[0] + '.tflite')
-            print("converted")
+            self.convert_k210(self.model_path.split(".")[0] + '.tflite') # It doesn't work with EfficientNetB0
+            
         if 'edgetpu' in self._converter_type:
             self.convert_tflite(model, model_layers, 'edgetpu')
             self.convert_edgetpu(model_path.split(".")[0] + '.tflite')
