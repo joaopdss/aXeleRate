@@ -148,6 +148,7 @@ def train_from_config(config,project_folder):
 										   config['train']['custom_callback'])
 	# 4 Convert the model
 	time.sleep(2)
+	print("Converting model")
 	converter.convert_model(model_path)	
 	return model_path
 
