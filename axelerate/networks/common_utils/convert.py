@@ -171,7 +171,7 @@ class Converter(object):
             print("Converting to tflite without Reshape")
             
         if target=='k210': 
-            if model_type == 'segnet':   
+            if not model_type == 'segnet':   
                 print("Converting to tflite with old converter for K210 Segnet")
                 converter = tf.lite.TFLiteConverter.from_keras_model(model)
                 converter.experimental_new_converter = False
