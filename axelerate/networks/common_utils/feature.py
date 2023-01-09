@@ -296,7 +296,7 @@ class MobileNetFeature(BaseFeatureExtractor):
 
 class MobileNetV2Feature(BaseFeatureExtractor):
 	"""docstring for ClassName"""
-	def __init__(self, input_size, weights, alpha):
+	def __init__(self, input_size, weights):
 		input_image = Input(shape=(input_size[0], input_size[1], 3))
 		input_shapes_imagenet = [(128, 128,3), (160, 160,3), (192, 192,3), (224, 224,3)]
 		input_shape =(128,128,3)
@@ -305,10 +305,10 @@ class MobileNetV2Feature(BaseFeatureExtractor):
 				input_shape = item
 
 		if weights == 'imagenet':
-			mobilenet = MobileNetV2(input_shape=input_shape, input_tensor=input_image, alpha = alpha, weights = 'imagenet', include_top=False, backend=tensorflow.keras.backend, layers=tensorflow.keras.layers, models=tensorflow.keras.models, utils=tensorflow.keras.utils)
+			mobilenet = MobileNetV2(input_shape=input_shape, input_tensor=input_image, alpha =1.0, weights = 'imagenet', include_top=False, backend=tensorflow.keras.backend, layers=tensorflow.keras.layers, models=tensorflow.keras.models, utils=tensorflow.keras.utils)
 			print('Successfully loaded imagenet backend weights')
 		else:
-			mobilenet = MobileNetV2(input_shape=(input_size[0],input_size[1],3),alpha = alpha,depth_multiplier = 1, dropout = 0.001, weights = None, include_top=False, backend=tensorflow.keras.backend, layers=tensorflow.keras.layers,models=tensorflow.keras.models,utils=tensorflow.keras.utils)
+			mobilenet = MobileNetV2(input_shape=(input_size[0],input_size[1],3),alpha =1.0,depth_multiplier = 1, dropout = 0.001, weights = None, include_top=False, backend=tensorflow.keras.backend, layers=tensorflow.keras.layers,models=tensorflow.keras.models,utils=tensorflow.keras.utils)
 			if weights:
 				print('Loaded backend weigths: '+weights)
 				mobilenet.load_weights(weights)
