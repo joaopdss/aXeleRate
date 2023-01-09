@@ -7,7 +7,7 @@ from tensorflow.keras.applications import DenseNet121
 from tensorflow.keras.applications import NASNetMobile
 from tensorflow.keras.applications import ResNet50
 from tensorflow.keras.applications import EfficientNetB0
-
+from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2
 from .mobilenet_sipeed.mobilenet import MobileNet
 
 def create_feature_extractor(architecture, input_size, weights = None):
@@ -42,6 +42,8 @@ def create_feature_extractor(architecture, input_size, weights = None):
 		feature_extractor = ResNet50Feature(input_size, weights)
 	elif architecture == 'EfficientNetB0':
 		feature_extractor = EfficientNetB0Feature(input_size, weights)
+	elif architecture == 'MobileNetV2':
+		feature_extractor = MobileNetV2(input_size, weights)
 	else:
 		raise Exception('Architecture not supported! Name should be Full Yolo, Tiny Yolo, MobileNet1_0, MobileNet7_5, MobileNet5_0, MobileNet2_5, SqueezeNet, NASNetMobile, ResNet50, DenseNet121 or EfficientNetB0')
 	return feature_extractor
