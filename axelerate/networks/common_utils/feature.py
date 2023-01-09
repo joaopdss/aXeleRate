@@ -44,7 +44,7 @@ def create_feature_extractor(architecture, input_size, weights = None):
 		feature_extractor = EfficientNetB0Feature(input_size, weights)
 	elif architecture == 'MobileNetV2':
 		print(input_size)
-		feature_extractor = MobileNetV2(input_size, weights)
+		feature_extractor = MobileNetV2Feature(input_size, weights)
 	else:
 		raise Exception('Architecture not supported! Name should be Full Yolo, Tiny Yolo, MobileNet1_0, MobileNet7_5, MobileNet5_0, MobileNet2_5, SqueezeNet, NASNetMobile, ResNet50, DenseNet121 or EfficientNetB0')
 	return feature_extractor
