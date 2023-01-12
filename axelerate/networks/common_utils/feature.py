@@ -8,7 +8,7 @@ from tensorflow.keras.applications import NASNetMobile
 from tensorflow.keras.applications import ResNet50
 from tensorflow.keras.applications import EfficientNetB0
 from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2
-from tensorflow.keras.applications.MobileNetV3Large import MobileNetV3
+from tensorflow.keras.applications import MobileNetV3Large
 from .mobilenet_sipeed.mobilenet import MobileNet
 
 def create_feature_extractor(architecture, input_size, weights = None):
