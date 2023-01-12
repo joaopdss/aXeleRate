@@ -8,6 +8,7 @@ from tensorflow.keras.applications import NASNetMobile
 from tensorflow.keras.applications import ResNet50
 from tensorflow.keras.applications import EfficientNetB0
 from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2
+from tensorflow.keras.applications.MobileNetV3Large import MobileNetV3
 from .mobilenet_sipeed.mobilenet import MobileNet
 
 def create_feature_extractor(architecture, input_size, weights = None):
@@ -43,8 +44,9 @@ def create_feature_extractor(architecture, input_size, weights = None):
 	elif architecture == 'EfficientNetB0':
 		feature_extractor = EfficientNetB0Feature(input_size, weights)
 	elif architecture == 'MobileNetV2':
-		print(input_size)
 		feature_extractor = MobileNetV2Feature(input_size, weights)
+	elif architecture == 'MobileNetV3Large':
+		feature_extractor = MobileNetV3Feature(input_size, weights)
 	else:
 		raise Exception('Architecture not supported! Name should be Full Yolo, Tiny Yolo, MobileNet1_0, MobileNet7_5, MobileNet5_0, MobileNet2_5, SqueezeNet, NASNetMobile, ResNet50, DenseNet121 or EfficientNetB0')
 	return feature_extractor
@@ -323,6 +325,37 @@ class MobileNetV2Feature(BaseFeatureExtractor):
 
 		return image	
 
+
+class MobileNetV3Feature(BaseFeatureExtractor):
+	"""docstring for ClassName"""
+	def __init__(self, input_size, weights):
+		input_image = Input(shape=(input_size[0], input_size[1], 3))
+		input_shapes_imagenet = [(128, 128,3), (160, 160,3), (192, 192,3), (224, 224,3)]
+		input_shape =(128,128,3)
+		for item in input_shapes_imagenet:
+			if item[0] <= input_size[0]:
+				input_shape = item
+
+		if weights == 'imagenet':
+			mobilenet = MobileNetV3Large(input_shape=input_shape, input_tensor=input_image, alpha =1.0, weights = 'imagenet', include_top=False)
+			print('Successfully loaded imagenet backend weights')
+		else:
+			mobilenet = MobileNetV3Large(input_shape=(input_size[0],input_size[1],3),alpha =1.0, weights = None, include_top=False)
+			if weights:
+				print('Loaded backend weigths: '+weights)
+				mobilenet.load_weights(weights)
+
+		#x = mobilenet(input_image)
+		self.feature_extractor = mobilenet
+
+	def normalize(self, image):
+		image = image / 255.
+		image = image - 0.5
+		image = image * 2.
+
+		return image	
+	
+	
 class SqueezeNetFeature(BaseFeatureExtractor):
 	"""docstring for ClassName"""
 	def __init__(self, input_size, weights):
