@@ -134,7 +134,7 @@ def process_image_segmentation(image, segmap, input_w, input_h, output_w, output
 
 def _create_augment_pipeline():
 
-    sometimes = lambda aug: iaa.Sometimes(0.1, aug)
+    sometimes = lambda aug: iaa.Sometimes(1, aug)
 
     aug_pipe = iaa.Sequential(
         [
