@@ -16,14 +16,14 @@ def create_datagen(train_folder, valid_folder, batch_size, input_size, project_f
     
     train_generator=train_datagen.flow_from_directory(train_folder,
                                                      target_size=input_size,
-                                                     color_mode='rgb',
+                                                     color_mode='gray',
                                                      batch_size=batch_size,
                                                      class_mode='categorical', 
 			                                         shuffle=True)
 
     validation_generator=validation_datagen.flow_from_directory(valid_folder,
                                                      target_size=input_size,
-                                                     color_mode='rgb',
+                                                     color_mode='gray',
                                                      batch_size=batch_size,
                                                      class_mode='categorical', 
 			                                         shuffle=True)		
