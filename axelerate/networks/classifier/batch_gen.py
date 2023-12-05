@@ -88,7 +88,7 @@ class ImageDataAugmentor(Sequence):
     def flow_from_directory(self,
                             directory,
                             target_size=(256, 256),
-                            color_mode='rgb',
+                            color_mode='gray',
                             classes=None,
                             class_mode='categorical',
                             batch_size=32,
