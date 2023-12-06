@@ -16,14 +16,14 @@ def create_datagen(train_folder, valid_folder, batch_size, input_size, project_f
     
     train_generator=train_datagen.flow_from_directory(train_folder,
                                                      target_size=input_size,
-                                                     color_mode='gray',
+                                                     color_mode='rgb',
                                                      batch_size=batch_size,
                                                      class_mode='categorical', 
 			                                         shuffle=True)
 
     validation_generator=validation_datagen.flow_from_directory(valid_folder,
                                                      target_size=input_size,
-                                                     color_mode='gray',
+                                                     color_mode='rgb',
                                                      batch_size=batch_size,
                                                      class_mode='categorical', 
 			                                         shuffle=True)
@@ -91,7 +91,7 @@ class ImageDataAugmentor(Sequence):
     def flow_from_directory(self,
                             directory,
                             target_size=(256, 256),
-                            color_mode='gray',
+                            color_mode='rgb',
                             classes=None,
                             class_mode='categorical',
                             batch_size=32,
