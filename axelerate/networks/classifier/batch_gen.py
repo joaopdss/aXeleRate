@@ -1,4 +1,4 @@
-r## Code heavily adapted from:
+## Code heavily adapted from:
 ## *https://github.com/keras-team/keras-preprocessing/blob/master/keras_preprocessing/
 
 """Utilities for real-time data augmentation on image data. """
