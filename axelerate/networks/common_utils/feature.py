@@ -522,10 +522,10 @@ class ResNet50Feature(BaseFeatureExtractor):
 
 class EfficientNetB0Feature(BaseFeatureExtractor):
 	def __init__(self, input_size, weights):
-		input_shape = Input(shape=(input_size[0], input_size[1], 1))
+		input_shape = Input(shape=(input_size[0], input_size[1], 3))
 		
 		if weights == 'imagenet':
-			efficientnetb0 = EfficientNetB0(input_tensor=input_shape, weights='imagenet', include_top=False, pooling=False)
+			efficientnetb0 = EfficientNetB0(input_tensor=input_shape, weights='imagenet', include_top=False, pooling=True)
 		else:
 			efficientnetb0 = EfficientNetB0(input_tensor=input_shape, include_top=False, pooling=False)
 			if weights:
