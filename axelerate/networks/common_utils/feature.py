@@ -6,7 +6,7 @@ from tensorflow.keras.layers import Concatenate
 from tensorflow.keras.applications import DenseNet121
 from tensorflow.keras.applications import NASNetMobile
 from tensorflow.keras.applications import ResNet50
-from tensorflow.keras.applications import EfficientNetB0
+from tensorflow.keras.applications import EfficientNetB0, EfficientNetB5
 from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2
 from tensorflow.keras.applications import MobileNetV3Large
 from tensorflow.keras.applications import MobileNetV3Small
@@ -44,6 +44,8 @@ def create_feature_extractor(architecture, input_size, weights = None):
 		feature_extractor = ResNet50Feature(input_size, weights)
 	elif architecture == 'EfficientNetB0':
 		feature_extractor = EfficientNetB0Feature(input_size, weights)
+	elif architecture == 'EfficientNetB5':
+		feature_extractor = EfficientNetB5Feature(input_size, weights)
 	elif architecture == 'MobileNetV2':
 		feature_extractor = MobileNetV2Feature(input_size, weights)
 	elif architecture == 'MobileNetV3Large':
@@ -528,6 +530,23 @@ class EfficientNetB0Feature(BaseFeatureExtractor):
 			efficientnetb0 = EfficientNetB0(input_tensor=input_shape, weights='imagenet', include_top=False, pooling=None)
 		else:
 			efficientnetb0 = EfficientNetB0(input_tensor=input_shape, include_top=False, pooling=False)
+			if weights:
+				efficientnetb0.load_weights(weights)
+				print('Loaded backend weights: ' + weights)
+		
+		self.feature_extractor = efficientnetb0
+		
+	def normalize(self, image):
+		return image
+
+class EfficientNetB5Feature(BaseFeatureExtractor):
+	def __init__(self, input_size, weights):
+		input_shape = Input(shape=(input_size[0], input_size[1], 3))
+		
+		if weights == 'imagenet':
+			efficientnetb0 = EfficientNetB5(input_tensor=input_shape, weights='imagenet', include_top=False, pooling=None)
+		else:
+			efficientnetb0 = EfficientNetB5(input_tensor=input_shape, include_top=False, pooling=False)
 			if weights:
 				efficientnetb0.load_weights(weights)
 				print('Loaded backend weights: ' + weights)
