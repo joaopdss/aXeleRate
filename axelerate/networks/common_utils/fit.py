@@ -123,8 +123,8 @@ def train(model,
 	else:
 		print('not using any custom_callbacks')
 	
-	class_weights = get_class_weights(train_batch_gen, imgs_folder)
-	print(f"Class weights: {class_weights}")
+	# class_weights = get_class_weights(train_batch_gen, imgs_folder)
+	# print(f"Class weights: {class_weights}")
 	# 4. training
 	try:
 		model.fit(train_batch_gen,
@@ -136,8 +136,7 @@ def train(model,
 						verbose		  = 1,
 						workers		  = 4,
 						max_queue_size   = 10,
-						use_multiprocessing = True,
-				   		class_weight = class_weights)
+						use_multiprocessing = True)
 	except KeyboardInterrupt:
 		print("Saving model and copying logs")
 		model.save(save_weights_name_ctrlc, overwrite=True, include_optimizer=False)
