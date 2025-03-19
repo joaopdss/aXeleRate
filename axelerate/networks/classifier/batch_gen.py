@@ -28,14 +28,11 @@ def create_datagen(train_folder, valid_folder, batch_size, input_size, project_f
                                                      class_mode='categorical', 
 			                                         shuffle=True)
 
-    for i in train_generator:
-	    print(i)
-	    break
+
     labels = (train_generator.class_indices)
     labels = dict((v,k) for k,v in labels.items())
     fo = open(os.path.join(project_folder,"labels.txt"), "w")
     for k,v in labels.items():
-        print(v)
         fo.write(v+"\n")
     fo.close()
     return train_generator, validation_generator
