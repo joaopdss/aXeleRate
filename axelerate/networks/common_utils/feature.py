@@ -7,6 +7,7 @@ from tensorflow.keras.applications import DenseNet121
 from tensorflow.keras.applications import NASNetMobile
 from tensorflow.keras.applications import ResNet50
 from tensorflow.keras.applications import EfficientNetB0, EfficientNetB5
+from tensorflow.keras.applications import EfficientNetV2L, EfficientNetV2M, EfficientNetV2S
 from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2
 from tensorflow.keras.applications import MobileNetV3Large
 from tensorflow.keras.applications import MobileNetV3Small
@@ -48,12 +49,18 @@ def create_feature_extractor(architecture, input_size, weights = None):
 		feature_extractor = EfficientNetB5Feature(input_size, weights)
 	elif architecture == 'MobileNetV2':
 		feature_extractor = MobileNetV2Feature(input_size, weights)
+	elif architecture == 'EfficientNetV2S':
+		feature_extractor = EfficientNetV2SFeature(input_size, weights)
+	elif architecture == 'EfficientNetV2M':
+		feature_extractor = EfficientNetV2MFeature(input_size, weights)
+	elif architecture == 'EfficientNetV2L':
+		feature_extractor = EfficientNetV2LFeature(input_size, weights)
 	elif architecture == 'MobileNetV3Large':
 		feature_extractor = MobileNetV3Feature(input_size, weights)
 	elif architecture == 'MobileNetV3Small':
 		feature_extractor = MobileNetV3SmallFeature(input_size, weights)
 	else:
-		raise Exception('Architecture not supported! Name should be Full Yolo, Tiny Yolo, MobileNet1_0, MobileNet7_5, MobileNet5_0, MobileNet2_5, SqueezeNet, NASNetMobile, ResNet50, DenseNet121 or EfficientNetB0')
+		raise Exception('Architecture not supported! Name should be Full Yolo, Tiny Yolo, MobileNet1_0, MobileNet7_5, MobileNet5_0, MobileNet2_5, SqueezeNet, NASNetMobile, ResNet50, DenseNet121, EfficientNetB0, EfficientNetB5, MobileNetV2, MobileNetV3Large, MobileNetV3Small, EfficientNetV2S, EfficientNetV2M, or EfficientNetV2L')
 	return feature_extractor
 
 
@@ -527,9 +534,9 @@ class EfficientNetB0Feature(BaseFeatureExtractor):
 		input_shape = Input(shape=(input_size[0], input_size[1], 3))
 		
 		if weights == 'imagenet':
-			efficientnetb0 = EfficientNetB0(input_tensor=input_shape, weights='imagenet', include_top=False, pooling=None)
+			efficientnetb0 = EfficientNetB0(input_tensor=input_shape, weights='imagenet', include_top=False, pooling=None, include_preprocessing=True)
 		else:
-			efficientnetb0 = EfficientNetB0(input_tensor=input_shape, include_top=False, pooling=False)
+			efficientnetb0 = EfficientNetB0(input_tensor=input_shape, include_top=False, pooling=False, include_preprocessing=True)
 			if weights:
 				efficientnetb0.load_weights(weights)
 				print('Loaded backend weights: ' + weights)
@@ -544,14 +551,68 @@ class EfficientNetB5Feature(BaseFeatureExtractor):
 		input_shape = Input(shape=(input_size[0], input_size[1], 3))
 		
 		if weights == 'imagenet':
-			efficientnetb0 = EfficientNetB5(input_tensor=input_shape, weights='imagenet', include_top=False, pooling=None)
+			efficientnetb5 = EfficientNetB5(input_tensor=input_shape, weights='imagenet', include_top=False, pooling=None)
 		else:
-			efficientnetb0 = EfficientNetB5(input_tensor=input_shape, include_top=False, pooling=False)
+			efficientnetb5 = EfficientNetB5(input_tensor=input_shape, include_top=False, pooling=False)
 			if weights:
-				efficientnetb0.load_weights(weights)
-				print('Loaded backend weights: ' + weights)
-		
-		self.feature_extractor = efficientnetb0
-		
+				print('Loaded backend weigths: '+weights)
+				efficientnetb5.load_weights(weights)
+		self.feature_extractor = efficientnetb5
+
+	def normalize(self, image):
+		from tensorflow.keras.applications.efficientnet import preprocess_input
+		return preprocess_input(image)
+
+class EfficientNetV2SFeature(BaseFeatureExtractor):
+	"""docstring for ClassName"""
+	def __init__(self, input_size, weights):
+		input_image = Input(shape=(input_size[0], input_size[1], 3))
+
+		if weights == 'imagenet':
+			efficientnetv2s = EfficientNetV2S(input_tensor=input_image, include_top=False, weights='imagenet', pooling=None, include_preprocessing=True)
+			print('Successfully loaded imagenet backend weights')
+		else:
+			efficientnetv2s = EfficientNetV2S(input_tensor=input_image, include_top=False, weights=None, pooling=None, include_preprocessing=True)
+			if weights:
+				print('Loaded backend weights: '+weights)
+				efficientnetv2s.load_weights(weights)
+		self.feature_extractor = efficientnetv2s
+
+	def normalize(self, image):
+		return image
+
+class EfficientNetV2MFeature(BaseFeatureExtractor):
+	"""docstring for ClassName"""
+	def __init__(self, input_size, weights):
+		input_image = Input(shape=(input_size[0], input_size[1], 3))
+
+		if weights == 'imagenet':
+			efficientnetv2m = EfficientNetV2M(input_tensor=input_image, include_top=False, weights='imagenet', pooling=None, include_preprocessing=True)
+			print('Successfully loaded imagenet backend weights')
+		else:
+			efficientnetv2m = EfficientNetV2M(input_tensor=input_image, include_top=False, weights=None, pooling=None, include_preprocessing=True)
+			if weights:
+				print('Loaded backend weights: '+weights)
+				efficientnetv2m.load_weights(weights)
+		self.feature_extractor = efficientnetv2m
+
+	def normalize(self, image):
+		return image
+
+class EfficientNetV2LFeature(BaseFeatureExtractor):
+	"""docstring for ClassName"""
+	def __init__(self, input_size, weights):
+		input_image = Input(shape=(input_size[0], input_size[1], 3))
+
+		if weights == 'imagenet':
+			efficientnetv2l = EfficientNetV2L(input_tensor=input_image, include_top=False, weights='imagenet', pooling=None, include_preprocessing=True)
+			print('Successfully loaded imagenet backend weights')
+		else:
+			efficientnetv2l = EfficientNetV2L(input_tensor=input_image, include_top=False, weights=None, pooling=None, include_preprocessing=True)
+			if weights:
+				print('Loaded backend weights: '+weights)
+				efficientnetv2l.load_weights(weights)
+		self.feature_extractor = efficientnetv2l
+
 	def normalize(self, image):
 		return image
