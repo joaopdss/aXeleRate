@@ -24,7 +24,8 @@ def train(model,
 		 network=None,
 		 metrics="val_loss",
 		 custom_callback=None,
-	 	 imgs_folder="data/dataset"):
+	 	 imgs_folder="data/dataset",
+		 reduce_lr_config=None):
 	"""A function that performs training on a general keras model.
 
 	# Args
@@ -95,8 +96,26 @@ def train(model,
 								 mode='auto', 
 								 period=1)
 								 
-	reduce_lr = ReduceLROnPlateau(monitor=metrics, factor=0.2,
-							  patience=10, min_lr=0.00001,verbose=1)
+	reduce_lr = None
+	if reduce_lr_config:
+		# If configuration is provided, use those values
+		print("Using custom ReduceLROnPlateau settings")
+		reduce_lr = ReduceLROnPlateau(
+			monitor=reduce_lr_config.get('monitor', metrics),
+			factor=reduce_lr_config.get('factor', 0.2),
+			patience=reduce_lr_config.get('patience', 10),
+			min_lr=reduce_lr_config.get('min_lr', 0.00001),
+			verbose=1
+		)
+	else:
+		# Use default values
+		reduce_lr = ReduceLROnPlateau(
+			monitor=metrics, 
+			factor=0.2,
+			patience=10, 
+			min_lr=0.00001,
+			verbose=1
+		)
 
 	map_evaluator_cb = MapEvaluation(network, valid_batch_gen,
 									 save_best=True,
@@ -122,6 +141,10 @@ def train(model,
 		callbacks.append(custom_callback)
 	else:
 		print('not using any custom_callbacks')
+	
+	# Add ReduceLROnPlateau to callbacks if it's enabled
+	if reduce_lr:
+		callbacks.append(reduce_lr)
 	
 	# class_weights = get_class_weights(train_batch_gen, imgs_folder)
 	# print(f"Class weights: {class_weights}")

@@ -87,6 +87,12 @@ def train_from_config(config,project_folder):
 		# 2. Load the pretrained weights (if any) 
 		classifier.load_weights(config['weights']['full'], by_name=True)
 
+		# Extract reduce_lr configuration if it exists
+		reduce_lr_config = None
+		if 'reduce_lr' in config['train']:
+			reduce_lr_config = config['train']['reduce_lr']
+			print("Using custom ReduceLROnPlateau configuration")
+
 		# 3. actual training 
 		model_layers, model_path = classifier.train(config['train']['train_image_folder'],
 											   config['train']['actual_epoch'],
@@ -99,7 +105,8 @@ def train_from_config(config,project_folder):
 											   config['train']['valid_image_folder'],
 											   config['train']['first_trainable_layer'],
 											   config['train']['valid_metric'],
-							   				   config['model']['loss'])
+							   				   config['model']['loss'],
+											   reduce_lr_config)
 
 
 
