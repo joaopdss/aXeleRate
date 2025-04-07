@@ -12,6 +12,7 @@ from axelerate.networks.yolo.frontend import create_yolo, get_object_labels
 from axelerate.networks.classifier.frontend_classifier import create_classifier, get_labels
 from axelerate.networks.segnet.frontend_segnet import create_segnet
 from axelerate.networks.common_utils.convert import Converter
+from IPython import get_ipython
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '4'
 import tensorflow as tf
@@ -94,7 +95,7 @@ def train_from_config(config,project_folder):
 			print("Using custom ReduceLROnPlateau configuration")
 
 		# 3. actual training 
-		model_layers, model_path = classifier.train(config['train']['train_image_folder'],
+		model_layers, model_path, plot_path = classifier.train(config['train']['train_image_folder'],
 											   config['train']['actual_epoch'],
 											   project_folder,
 											   config["train"]["batch_size"],
@@ -108,7 +109,13 @@ def train_from_config(config,project_folder):
 							   				   config['model']['loss'],
 											   reduce_lr_config)
 
-
+		# If running in a notebook, provide a message about the plot path
+		try:
+			if get_ipython() is not None and plot_path:
+				print(f"Performance analysis plots generated at: {plot_path}")
+				print("The plots have been displayed in the notebook above")
+		except (ImportError, NameError):
+			pass
 
 	#  Detector
 	if config['model']['type']=='Detector':
