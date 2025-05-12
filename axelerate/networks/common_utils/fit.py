@@ -166,21 +166,41 @@ def train(model,
 						max_queue_size   = 10,
 						use_multiprocessing = True)
 	except KeyboardInterrupt:
-		print("Saving model and copying logs")
+		print("\nTraining interrupted. Saving model and logs...")
 		model.save(save_weights_name_ctrlc, overwrite=True, include_optimizer=False)
-		shutil.copytree("logs", os.path.join(path, "logs"))  
+		if os.path.exists("logs"):
+			try:
+				shutil.copytree("logs", os.path.join(path, "logs"))
+			except Exception as e:
+				print(f"Error copying logs: {e}")
 		return model.layers, save_weights_name_ctrlc, None 
 		
-	shutil.copytree("logs", os.path.join(path, "logs"))
+	# Evaluate the model on validation data to get final metrics reported by Keras
+	print("\nEvaluating model on validation data for final metrics...")
+	final_metrics = model.evaluate(valid_batch_gen, steps=len(valid_batch_gen), verbose=1)
+	keras_val_loss = final_metrics[model.metrics_names.index('loss')]
+	keras_val_accuracy = final_metrics[model.metrics_names.index('accuracy')] # Assuming 'accuracy' is the metric
+	print(f"Final Keras validation loss: {keras_val_loss:.4f}, validation accuracy: {keras_val_accuracy:.4f}")
+
+	if os.path.exists("logs"):
+		try:
+			shutil.copytree("logs", os.path.join(path, "logs"))
+		except Exception as e:
+			print(f"Error copying logs: {e}")
 	_print_time(time.time()-train_start)
 	
 	# Generate correlation matrix plot if this is a classifier
 	plot_path = None
 	if network and network.__class__.__name__ == 'Classifier':
 		try:
-			plot_path = create_correlation_matrix_plot(model, valid_batch_gen, network._labels, project_folder)
+			# Pass the evaluated Keras metrics to the plotting function
+			plot_path = create_correlation_matrix_plot(model, valid_batch_gen, network._labels, project_folder, 
+													 keras_val_loss=keras_val_loss, 
+													 keras_val_accuracy=keras_val_accuracy)
 		except Exception as e:
 			print(f"Warning: Could not generate correlation matrix plot: {str(e)}")
+			import traceback
+			traceback.print_exc()
 	
 	return model.layers, save_weights_name, plot_path
 
@@ -199,47 +219,83 @@ def get_class_weights(train_batch_gen, imgs_folder):
 	
 	return class_weights
 
-def create_correlation_matrix_plot(model, validation_generator, labels, project_folder):
+def create_correlation_matrix_plot(model, validation_generator, labels, project_folder, 
+                                   keras_val_loss=None, keras_val_accuracy=None):
     """
     Creates a beautiful correlation matrix plot based on model predictions on validation data.
+    Uses final validation metrics provided by Keras if available.
     
     Args:
         model: The trained Keras model
         validation_generator: Data generator for validation data
         labels: List of class labels
         project_folder: Folder to save the plot
+        keras_val_loss: Final validation loss reported by Keras model.evaluate()
+        keras_val_accuracy: Final validation accuracy reported by Keras model.evaluate()
         
     Returns:
         Path to the saved plot
     """
     print("\nGenerating correlation matrix and performance metrics from validation data...")
     
-    # Get all validation data
+    # Import necessary libraries inside the function
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+    import time
+    import os
+    from sklearn.metrics import confusion_matrix, classification_report, precision_recall_fscore_support
+    from IPython import get_ipython # Keep for display logic
+    from IPython.display import display # Keep for display logic
+
+    # Get all validation data for confusion matrix generation
     num_samples = validation_generator.samples
     steps = np.ceil(num_samples / validation_generator.batch_size)
     
-    # Reset the generator to ensure we start from the beginning
+    # Reset the generator to ensure we start from the beginning for predictions
     validation_generator.reset()
     
     # Get ground truth labels
-    true_classes = validation_generator.classes
+    # Ensure we get all labels, handle potential partial last batch
+    true_classes = []
+    for i in range(int(steps)):
+        _, batch_labels = validation_generator[i]
+        true_classes.extend(np.argmax(batch_labels, axis=1) if batch_labels.ndim > 1 else batch_labels)
+    true_classes = np.array(true_classes[:num_samples]) # Trim to exact number of samples
     
     # Get predictions
+    validation_generator.reset() # Reset again before predicting
     predictions = model.predict(validation_generator, steps=steps, verbose=1)
-    predicted_classes = np.argmax(predictions, axis=1)
+    predicted_classes = np.argmax(predictions[:num_samples], axis=1) # Ensure predictions match samples
     
     # Create confusion matrix
-    from sklearn.metrics import confusion_matrix, classification_report, accuracy_score, precision_recall_fscore_support
-    cm = confusion_matrix(true_classes[:len(predicted_classes)], predicted_classes)
+    cm = confusion_matrix(true_classes, predicted_classes)
     
-    # Calculate metrics
-    accuracy = accuracy_score(true_classes[:len(predicted_classes)], predicted_classes)
-    precision, recall, f1, _ = precision_recall_fscore_support(true_classes[:len(predicted_classes)], 
+    # Calculate metrics - Use Keras evaluate results if available, otherwise calculate
+    if keras_val_accuracy is not None:
+        accuracy = keras_val_accuracy
+        print(f"Using Keras final validation accuracy: {accuracy:.4f}")
+    else:
+        from sklearn.metrics import accuracy_score
+        accuracy = accuracy_score(true_classes, predicted_classes)
+        print(f"Calculating accuracy manually: {accuracy:.4f}")
+
+    # Calculate weighted precision, recall, F1 using scikit-learn as Keras evaluate doesn't provide these directly
+    precision, recall, f1, _ = precision_recall_fscore_support(true_classes, 
                                                              predicted_classes, 
                                                              average='weighted')
-    
+    print(f"Calculated weighted Precision: {precision:.4f}, Recall: {recall:.4f}, F1: {f1:.4f}")
+
+    # Per-class metrics from classification_report
+    clf_report = classification_report(true_classes, 
+                                      predicted_classes, 
+                                      target_names=labels, 
+                                      output_dict=True)
+
     # Normalize the confusion matrix
-    cm_normalized = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+    with np.errstate(divide='ignore', invalid='ignore'): # Handle potential division by zero for classes with no samples
+        cm_normalized = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        cm_normalized = np.nan_to_num(cm_normalized) # Replace NaN with 0
     
     # Create a figure with two subplots side by side
     fig = plt.figure(figsize=(20, 10))
@@ -273,33 +329,29 @@ def create_correlation_matrix_plot(model, validation_generator, labels, project_
     # Remove axis
     ax2.axis('off')
     
-    # Create text for metrics
+    # --- Use Keras accuracy, calculated precision/recall/F1 ---
     metrics_text = (
         f"# Classification Performance Metrics\n\n"
         f"## Overall Metrics\n"
-        f"- **Accuracy**: {accuracy:.4f}\n"
+        f"- **Accuracy (from Keras)**: {accuracy:.4f}\n" # Label clearly it's from Keras
         f"- **Precision (weighted)**: {precision:.4f}\n"
         f"- **Recall (weighted)**: {recall:.4f}\n"
         f"- **F1 Score (weighted)**: {f1:.4f}\n\n"
-        f"## Per-Class Metrics\n"
+        f"## Per-Class Metrics (from sklearn)\n"
     )
     
-    # Add per-class metrics
-    report = classification_report(true_classes[:len(predicted_classes)], 
-                                 predicted_classes, 
-                                 target_names=labels, 
-                                 output_dict=True)
-    
+    # Add per-class metrics from the calculated report
     for label in labels:
-        if label in report:
+        if label in clf_report and isinstance(clf_report[label], dict):
             metrics_text += (
                 f"### {label}\n"
-                f"- Precision: {report[label]['precision']:.4f}\n"
-                f"- Recall: {report[label]['recall']:.4f}\n"
-                f"- F1 Score: {report[label]['f1-score']:.4f}\n"
-                f"- Support: {report[label]['support']}\n\n"
+                f"- Precision: {clf_report[label]['precision']:.4f}\n"
+                f"- Recall: {clf_report[label]['recall']:.4f}\n"
+                f"- F1 Score: {clf_report[label]['f1-score']:.4f}\n"
+                f"- Support: {clf_report[label]['support']}\n\n"
             )
-    
+        # Handle cases like 'accuracy', 'macro avg', 'weighted avg' if needed, or skip
+
     # Add the text to the plot
     ax2.text(0, 1, metrics_text, fontsize=12, va='top', 
              family='monospace', transform=ax2.transAxes)
@@ -335,9 +387,7 @@ def create_correlation_matrix_plot(model, validation_generator, labels, project_
     
     # Check if we're in a Jupyter/IPython environment and display the plots
     try:
-        from IPython import get_ipython
         if get_ipython() is not None:
-            from IPython.display import display
             print("Displaying plots in notebook...")
             # Display the figures in the notebook
             display(fig)
@@ -346,23 +396,24 @@ def create_correlation_matrix_plot(model, validation_generator, labels, project_
         # Not in IPython environment
         pass
     
-    plt.close('all')
+    plt.close('all') # Close all figures
     
     print(f"Performance analysis saved to: {plot_path}")
     
-    # Save metrics as text file for reference
+    # Save metrics as text file for reference (using Keras accuracy)
     metrics_file = os.path.join(project_folder, 'classification_metrics.txt')
     with open(metrics_file, 'w') as f:
         f.write(f"Classification Performance Metrics\n")
         f.write(f"================================\n\n")
         f.write(f"Generated on: {timestamp}\n\n")
         f.write(f"Overall Metrics:\n")
-        f.write(f"- Accuracy: {accuracy:.4f}\n")
-        f.write(f"- Precision (weighted): {precision:.4f}\n")
-        f.write(f"- Recall (weighted): {recall:.4f}\n")
-        f.write(f"- F1 Score (weighted): {f1:.4f}\n\n")
-        f.write(f"Per-Class Metrics:\n")
-        f.write(classification_report(true_classes[:len(predicted_classes)], 
+        f.write(f"- Accuracy (from Keras): {accuracy:.4f}\n")
+        f.write(f"- Precision (weighted, sklearn): {precision:.4f}\n")
+        f.write(f"- Recall (weighted, sklearn): {recall:.4f}\n")
+        f.write(f"- F1 Score (weighted, sklearn): {f1:.4f}\n\n")
+        f.write(f"Per-Class Metrics (from sklearn):\n")
+        # Use the string version of classification report for simplicity here
+        f.write(classification_report(true_classes, 
                                      predicted_classes, 
                                      target_names=labels))
     
