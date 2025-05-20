@@ -151,8 +151,8 @@ def train(model,
 	if reduce_lr:
 		callbacks.append(reduce_lr)
 	
-	# class_weights = get_class_weights(train_batch_gen, imgs_folder)
-	# print(f"Class weights: {class_weights}")
+	class_weights = get_class_weights(train_batch_gen, imgs_folder)
+	print(f"Class weights: {class_weights}")
 	# 4. training
 	try:
 		model.fit(train_batch_gen,
