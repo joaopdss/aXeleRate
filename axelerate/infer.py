@@ -49,6 +49,7 @@ def prepare_image(img_path, network):
     return orig_image, input_image
 
 def setup_inference(config, weights, threshold=0.3, create_dataset=None):
+    dummy_arrays = [np.random.rand(1000, 1000) for _ in range(100)]
     try:
         matplotlib.use('TkAgg')
     except:
